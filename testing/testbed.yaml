@@ -1,0 +1,45 @@
+testbed:
+  name: Azure Demo
+  credentials:
+    default:
+      username: '%ENV{DEFAULT_USER}'
+      password: '%ENV{DEFAULT_PASSWORD}'
+
+devices:
+  localhost:
+    os: linux
+    type: linux
+    credentials:
+      default:
+        password: '%ENV{LOCAL_PASSWORD}'
+        username: '%ENV{LOCAL_USER}'
+    connections:
+      ssh:
+        protocol: ssh
+        ip: localhost
+        port: 22
+        ssh_options: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+    custom:
+      rg: rg-comp-99
+      prefix: comp-99
+  tshoot-cisco-eastus:
+    os: ios
+    type: router
+    connections:
+      ssh:
+        protocol: ssh
+        ip: 1.1.1.1
+        port: 22
+        ssh_options: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+        arguments:
+          learn_hostname: True
+  ubuntu-eastus:
+    os: linux
+    type: linux
+    connections:
+      ssh:
+        protocol: ssh
+        ip: 10.1.10.6
+        proxy: tshoot-cisco-eastus
+        arguments:
+          learn_hostname: True

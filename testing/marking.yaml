@@ -1,0 +1,26 @@
+testcases:
+  Testcase_A:
+    name: Linux
+    tests:
+      Task_01_Internet_access:
+        - desc: East client has access to internet
+          device: ubuntu-eastus
+          exec_command: ping -c2 google.com ; ping -c5 google.com 2>&1 | awk -F'/' 'END{ print (/^rtt/? "OK "$5" ms":"FAIL") }'
+          assert_value: "OK"
+      Task_02_Web_services:
+        - desc: Check DNS record
+          device: localhost
+          exec_command: nslookup website.$PREFIX.az.skillscloud.company $(dig ns $PREFIX.az.skillscloud.company +short | head -n1)
+          assert_not_values:
+            - "server can't find"
+            - "Address: 10.1.10.6"
+        - desc: Check web port translation rule
+          device: tshoot-cisco-eastus
+          exec_command: show ip nat translation src-port 80
+          assert_value: "tcp  10.1.1.4:80"
+        - desc: NGINX website
+          device: localhost
+          exec_command: curl  http://website.$PREFIX.az.skillscloud.company -v 2> /dev/null
+          assert_value: "nginx" 
+    cleanup_steps:
+
