@@ -1,31 +1,18 @@
 module "competition" {
     source = "./terraform"
-    count = 31
+    count = 14
     prefix = format("comp-%02d", count.index+1)
+    competition_instance = "demo39"
 }
-
-# module "competition-west" {
-#     source = "./terraform-westus"
-#     count = 10
-#     prefix = format("comp-%02d", count.index+11)
-# }
-
-# module "competition-south" {
-#     source = "./terraform-southcentralus"
-#     count = 10
-#     prefix = format("comp-%02d", count.index+21)
-# }
-
 
 output "passwords" {
-  value = [ module.competition.*.pass ]
+  value =  module.competition.*.pass 
 }
 
-# output "passwords-west" {
-#   value = [ module.competition-west.*.pass ]
-# }
+output "static-params" {
+  value =  module.competition[0].static-params 
+}
 
-
-# output "passwords-south" {
-#   value = [ module.competition-south.*.pass ]
-# }
+output "dynamic-params" {
+  value = merge(module.competition.*.dynamic-params...)
+}

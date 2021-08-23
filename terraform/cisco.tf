@@ -1,12 +1,12 @@
 ##EASTUS============
-resource "azurerm_network_interface" "cisco-eastus" {
-  name                = "${var.prefix}-cisco-eastus"
+resource "azurerm_network_interface" "gw-region-01" {
+  name                = "${var.prefix}-gw-region-01"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.eastus-private01.id
+    subnet_id                     = azurerm_subnet.region-01-private01.id
     private_ip_address_allocation = "Static"
     private_ip_address_version    = "IPv4"
     primary                       = true
@@ -15,25 +15,25 @@ resource "azurerm_network_interface" "cisco-eastus" {
   enable_ip_forwarding = true
 }
 
-resource "azurerm_network_interface" "cisco-eastus-public" {
-  name                = "${var.prefix}-cisco-eastus-public"
+resource "azurerm_network_interface" "gw-region-01-public" {
+  name                = "${var.prefix}-gw-region-01-public"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
   ip_configuration {
     name                          = "public"
-    subnet_id                     = azurerm_subnet.eastus-public01.id
+    subnet_id                     = azurerm_subnet.region-01-public01.id
     private_ip_address_allocation = "Static" #have to be Dynamic according to template. why?
     private_ip_address_version    = "IPv4"
     primary                       = true
     private_ip_address            = "10.1.1.4"
-    public_ip_address_id          = azurerm_public_ip.cisco-eastus.id
+    public_ip_address_id          = azurerm_public_ip.gw-region-01.id
   }
   enable_ip_forwarding = true
 }
 
-resource "azurerm_public_ip" "cisco-eastus" {
-  name                    = "${var.prefix}-cisco-eastus-public"
+resource "azurerm_public_ip" "gw-region-01" {
+  name                    = "${var.prefix}-gw-region-01-public"
   location                = azurerm_resource_group.main.location
   resource_group_name     = azurerm_resource_group.main.name
   sku                     = "Basic"
@@ -42,8 +42,8 @@ resource "azurerm_public_ip" "cisco-eastus" {
   idle_timeout_in_minutes = 4
 }
 
-resource "azurerm_linux_virtual_machine" "cisco-eastus" {
-  name                = "${var.prefix}-cisco-eastus"
+resource "azurerm_linux_virtual_machine" "gw-region-01" {
+  name                = "${var.prefix}-gw-region-01"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   plan {
@@ -59,17 +59,17 @@ resource "azurerm_linux_virtual_machine" "cisco-eastus" {
 
 
   allow_extension_operations = true
-  computer_name              = "${var.prefix}-cisco-eastus"
+  computer_name              = "${var.prefix}-gw-region-01"
   network_interface_ids = [
-    azurerm_network_interface.cisco-eastus-public.id,
-    azurerm_network_interface.cisco-eastus.id
+    azurerm_network_interface.gw-region-01-public.id,
+    azurerm_network_interface.gw-region-01.id
   ]
 
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "StandardSSD_LRS"
     disk_size_gb         = 16
-    name                 = "${var.prefix}-cisco-eastus"
+    name                 = "${var.prefix}-gw-region-01"
   }
 
   source_image_reference {
@@ -78,5 +78,5 @@ resource "azurerm_linux_virtual_machine" "cisco-eastus" {
     sku       = "17_2_1-payg-sec"
     version   = "latest"
   }
-  # custom_data = base64encode(templatefile("${path.module}/customdata-cisco-eastus.tpl", { westip = azurerm_public_ip.cisco-westus.ip_address, southip = azurerm_public_ip.cisco-southcentralus.ip_address }))
+  # custom_data = base64encode(templatefile("${path.module}/customdata-gw-region-01.tpl", { westip = azurerm_public_ip.gw-westus.ip_address, southip = azurerm_public_ip.gw-southcentralus.ip_address }))
 }

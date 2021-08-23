@@ -1,6 +1,10 @@
 variable "prefix" {
   default = "comp-99"
 }
+variable "competition_instance" {
+  default = "gfd39"
+  type = string
+}
 
 variable "adminuser" {
   default = "azadmin"
@@ -18,8 +22,8 @@ variable "ts39-api-url" {
 }
 
 resource "azurerm_resource_group" "main" {
-  name     = "rg-${var.prefix}"
-  location = "eastus"
+  name     = "rg-${var.competition_instance}-${var.prefix}"
+  location = "westus2"
 }
 
 resource "random_string" "pass" {
@@ -33,9 +37,9 @@ resource "random_string" "pass" {
 }
 
 resource "azuread_user" "competitor" {
-  user_principal_name = "${var.prefix}@az.skillscloud.company"
-  display_name        = var.prefix
-  mail_nickname       = var.prefix
+  user_principal_name = "${var.competition_instance}-${var.prefix}@nsalab.org"
+  display_name        = "${var.competition_instance}-${var.prefix}"
+  mail_nickname       = "${var.competition_instance}-${var.prefix}"
   password            = random_string.pass.result
 }
 
@@ -45,6 +49,3 @@ resource "azurerm_role_assignment" "example" {
   principal_id         = azuread_user.competitor.object_id
 }
 
-output "pass" {
-  value = {(var.prefix) = random_string.pass.result}
-}
