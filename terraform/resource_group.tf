@@ -14,7 +14,7 @@ variable "adminuser" {
 # }
 
 variable "prod_rg" {
-  default = "common_rg"
+  default = "nsalab-prod"
 }
 
 variable "ts39-api-url" {

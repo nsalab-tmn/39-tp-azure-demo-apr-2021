@@ -6,8 +6,8 @@ resource "azurerm_dns_zone" "comp-hz" {
 
 
 resource "azurerm_dns_ns_record" "parrent_record" {
-  name                = var.prefix
-  zone_name           = "${var.competition_instance}-${var.prefix}"
+  name                = "${var.competition_instance}-${var.prefix}"
+  zone_name           = "az.skillscloud.company"
   resource_group_name = var.prod_rg
   ttl                 = 300
 
